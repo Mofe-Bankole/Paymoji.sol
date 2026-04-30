@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const showcaseNames = [
   "RAINBOWPIZZA.SOL",
   "UNICORNPIZZA.SOL",
@@ -104,24 +106,30 @@ export default function Home() {
 
       <header className="sticky top-0 z-50 border-b border-white/10 bg-background/75 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <a href="#" className="text-xl font-black tracking-[-0.08em] text-white">
-            paymoji<span className="text-gradient-sol">.sol</span>
-          </a>
+          <Link
+            href="/"
+            className="text-xl font-black tracking-[-0.08em] text-white"
+          >
+            Paymoji
+          </Link>
 
           <nav className="hidden items-center gap-8 text-sm font-semibold text-white/70 md:flex">
             <a className="transition-colors hover:text-white" href="#features">
               Features
             </a>
-            <a className="transition-colors hover:text-white" href="#how-it-works">
+            <a
+              className="transition-colors hover:text-white"
+              href="#how-it-works"
+            >
               How it works
             </a>
           </nav>
 
           <a
-            href="#claim"
+            href="/register"
             className="bg-electric rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_0_30px_rgba(0,203,230,0.2)] transition-transform duration-150 hover:scale-[1.02]"
           >
-            Launch App
+            Login
           </a>
         </div>
       </header>
@@ -142,21 +150,11 @@ export default function Home() {
             and make crypto feel personal enough to remember.
           </p>
 
-          <div className="glass-surface neon-glow-cyan mt-10 max-w-2xl rounded-[28px] p-3">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center">
-              <div className="min-w-0 flex-1 rounded-[22px] bg-white/5 px-5 py-4 text-left">
-                <div className="text-3xl tracking-[0.3em] text-white md:text-4xl">
-                  🚀 💎 🔥
-                </div>
-                <div className="mt-2 text-sm font-semibold uppercase tracking-[0.24em] text-white/40">
-                  3 emojis • 1 identity • .sol
-                </div>
-              </div>
-
-              <button className="bg-electric rounded-[22px] px-6 py-4 text-sm font-extrabold uppercase tracking-[0.24em] text-white transition duration-150 hover:brightness-110">
-                Check availability
-              </button>
-            </div>
+          <div className="mt-10 flex max-w-2xl items-center gap-3 rounded-2xl bg-white/5 p-4">
+            <div className="flex-1 text-3xl text-white">🚀💎🔥</div>
+            <button className="bg-electric rounded-xl px-5 py-3 text-xs font-bold text-white hover:brightness-110 transition">
+              Check
+            </button>
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-white/55">
@@ -176,12 +174,14 @@ export default function Home() {
               </div>
 
               <div className="mt-8 text-center">
-                <div className="text-7xl leading-none md:text-8xl">🌈 🦄 🍕</div>
+                <div className="text-7xl leading-none md:text-8xl">
+                  🌈 🦄 🍕
+                </div>
                 <div className="mt-6 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-extrabold uppercase tracking-[0.24em] text-white">
                   rainbowpizza.sol
                 </div>
                 <div className="mt-6 rounded-[24px] border border-secondary/20 bg-black/30 px-4 py-4 font-mono text-xs text-secondary">
-                  0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+                  5fWq4a4ct8ie2EiSvJ84tXkKwjVcATJxMKiTZQuFsGuH
                 </div>
               </div>
 
@@ -190,19 +190,25 @@ export default function Home() {
                   <div className="text-xs uppercase tracking-[0.2em] text-white/45">
                     Status
                   </div>
-                  <div className="mt-2 text-lg font-bold text-white">Available</div>
+                  <div className="mt-2 text-lg font-bold text-white">
+                    Available
+                  </div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-white/45">
                     Privacy
                   </div>
-                  <div className="mt-2 text-lg font-bold text-white">Stealth ready</div>
+                  <div className="mt-2 text-lg font-bold text-white">
+                    Stealth ready
+                  </div>
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/5 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-white/45">
                     Network
                   </div>
-                  <div className="mt-2 text-lg font-bold text-white">Sub-second</div>
+                  <div className="mt-2 text-lg font-bold text-white">
+                    Sub-second
+                  </div>
                 </div>
               </div>
             </div>
@@ -224,7 +230,9 @@ export default function Home() {
               key={`${name}-${index}`}
               className="flex shrink-0 items-center gap-3 text-sm font-bold uppercase tracking-[0.18em] text-white/75"
             >
-              <span className="text-2xl">{["🚀💎🔥", "🌈🦄🍕", "🦁🏀⚡️", "🌊🏄‍♂️💎", "👾🎮🔥"][index % 5]}</span>
+              <span className="text-2xl">
+                {["🚀💎🔥", "🌈🦄🍕", "🦁🏀⚡️", "🌊🏄‍♂️💎", "👾🎮🔥"][index % 5]}
+              </span>
               <span>{name}</span>
             </div>
           ))}
@@ -237,7 +245,7 @@ export default function Home() {
             Why it clicks
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-white md:text-5xl">
-            A landing page that explains the product in one pass.
+            Where form meets function—and both swipe right.
           </h2>
           <p className="mt-4 text-base text-on-surface-variant md:text-lg">
             The UI is now organized into reusable sections so we can iterate on
@@ -270,9 +278,11 @@ export default function Home() {
               {feature.footer ? (
                 <div className="mt-6 overflow-hidden rounded-[20px] border border-white/8 bg-black/20 px-4 py-3 text-xl text-white/55">
                   <div className="animate-marquee flex min-w-max gap-4">
-                    {[...feature.footer, ...feature.footer].map((item, index) => (
-                      <span key={`${item}-${index}`}>{item}</span>
-                    ))}
+                    {[...feature.footer, ...feature.footer].map(
+                      (item, index) => (
+                        <span key={`${item}-${index}`}>{item}</span>
+                      ),
+                    )}
                   </div>
                 </div>
               ) : null}
@@ -297,7 +307,10 @@ export default function Home() {
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {steps.map((step, index) => (
-              <article key={step.title} className="glass-surface rounded-[28px] p-6">
+              <article
+                key={step.title}
+                className="glass-surface rounded-[28px] p-6"
+              >
                 <div className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl font-black text-white">
                   {index + 1}
                 </div>
