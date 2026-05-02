@@ -8,7 +8,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "paymoji.sol",
+  title: "Paymoji",
   description: "Emoji-native Solana identities and payments.",
 };
 

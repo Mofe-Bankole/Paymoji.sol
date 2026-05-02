@@ -1,6 +1,9 @@
 "use client";
+import { Mail } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 export default function Register() {
+  // const date = Date.now();
   const [regisMode, setRegisMode] = useState<"signup" | "login">("login");
   return (
     <>
@@ -10,8 +13,16 @@ export default function Register() {
           <div className="absolute top-[10%] left-[-10%] w-64 h-64 bg-primary-container/20 rounded-full blur-[80px]"></div>
           <div className="absolute bottom-[20%] right-[-10%] w-72 h-72 bg-secondary/10 rounded-full blur-[100px]"></div>
         </div>
+        <Link
+          href="/"
+          className="text-2xl font-black tracking-[-0.08em] text-white"
+        >
+          Paymoji
+        </Link>
+
         {/*<!-- Hero Identity Header -->*/}
         <div className="text-center space-y-sm">
+          
           <div className="inline-flex items-center justify-center p-sm glass-surface rounded-full mb-sm border-white/5">
             <span className="text-display-emoji font-display-emoji">
               🚀 🌈 ✨
@@ -74,7 +85,9 @@ export default function Register() {
                     <span
                       className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] group-focus-within:text-secondary transition-colors"
                       data-icon="mail"
-                    ></span>
+                    >
+                      <Mail />
+                    </span>
                     <input
                       className="w-full bg-surface-container-lowest border border-white/5 rounded-full py-sm pl-xl pr-md text-body-sm font-body-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary/20 transition-all placeholder:text-on-surface-variant/40"
                       placeholder="Enter your email"
@@ -153,7 +166,7 @@ export default function Register() {
           </span>
         </div>
         <p className="font-['Plus_Jakarta_Sans'] text-[10px] uppercase tracking-widest text-slate-500">
-          © 2024 paymoji.sol • Powered by Okto SDK
+          © 2026 paymoji.sol • Powered by Okto SDK
         </p>
       </footer>
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 opacity-40">
