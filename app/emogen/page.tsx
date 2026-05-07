@@ -1,7 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState, useMemo } from "react";
+import { usePrivy } from "@privy-io/react-auth";
+import { useState, useMemo, useEffect } from "react";
 import emojiData from "emoji-datasource/emoji.json";
+import { generateSolName } from "@/lib/generateSolName";
+import { createMetaPlexCollection } from "@/scripts/createCollection";
 
 const groups = {
   "Smileys & Emotion": "Smileys",
@@ -42,14 +45,27 @@ const filterOrder = Object.keys(groups)
 
 export default function Emogen() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [solName, setSolName] = useState<string>("");
+  const { user } = usePrivy();
   const [activeFilter, setActiveFilter] = useState<string>(
     filterOrder[0] ?? "",
   );
+
+  const handleSolName = async (selected: string[]) => {
+    const name = await generateSolName(selected);
+    setSolName(name);
+    await createMetaPlexCollection(selected);
+  };
+
+  useEffect(() => {
+    setSolName("");
+  }, [selected]);
 
   // Filtered list for the current category
   const emojis = useMemo(() => grouped[activeFilter] ?? [], [activeFilter]);
 
   const toggleEmoji = (char: string) => {
+    console.log(char);
     setSelected((prev) => {
       if (prev.includes(char)) return prev.filter((c) => c !== char);
       if (prev.length < 3) return [...prev, char];
@@ -66,7 +82,7 @@ export default function Emogen() {
           <button
             key={e.char}
             onClick={() => toggleEmoji(e.char)}
-            className={`flex items-center justify-center py-2  rounded border ${isSelected ? "bg-primary/20 border-primary" : "bg-white/5 border-white/10 hover:bg-white/10"}`}
+            className={`flex items-center justify-center py-2 rounded border ${isSelected ? "bg-primary/20 border-primary" : "bg-white/5 border-white/10 hover:bg-white/10"}`}
           >
             <span className="text-xl" aria-label={e.char}>
               {e.char}
@@ -86,7 +102,7 @@ export default function Emogen() {
         {/* Selected display */}
         <Link
           href="/"
-          className="text-2xl font-black tracking-[-0.08em] text-white"``
+          className="text-2xl font-black tracking-[-0.08em] text-white"
         >
           Paymoji
         </Link>
@@ -102,7 +118,23 @@ export default function Emogen() {
             </span>
           ))}
         </div>
-
+        {selected.length === 3 && solName && (
+          <div
+            onClick={() => handleSolName(selected)}
+            className={`px-5 mt-1 py-2 text-sm cursor-pointer rounded-[5px] border bg-white/5 border-white/10 hover:bg-white/10`}
+          >
+            {solName}
+          </div>
+        )}
+        {selected.length === 3 ? (
+          <button
+            className={`mt-4 px-8 py-3 rounded-full text-sm font-bold text-white transition-transform duration-150 ${selected.length === 3 ? "bg-electric shadow-[0_0_30px_rgba(0,203,230,0.2)] hover:scale-[1.02]" : "bg-white/10 cursor-not-allowed"}`}
+          >
+            Continue as {solName || "foxwave.sol"}
+          </button>
+        ) : (
+          ""
+        )}
         {/* Filter tabs – minimal radius (5px) */}
         <nav className="flex flex-wrap gap-2 justify-center">
           {filterOrder.map((group) => (
@@ -122,16 +154,6 @@ export default function Emogen() {
         </div>
 
         {/* Continue button */}
-        <Link
-          href={
-            selected.length === 3
-              ? `/register?emoji=${selected.join(",")}`
-              : "#"
-          }
-          className={`mt-4 px-8 py-3 rounded-full text-sm font-bold text-white transition-transform duration-150 ${selected.length === 3 ? "bg-electric shadow-[0_0_30px_rgba(0,203,230,0.2)] hover:scale-[1.02]" : "bg-white/10 cursor-not-allowed"}`}
-        >
-          {selected.length === 3 ? "Continue to Register" : "Select 3 emojis"}
-        </Link>
       </div>
     </main>
   );

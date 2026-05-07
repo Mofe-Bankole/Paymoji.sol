@@ -1,10 +1,17 @@
 "use client";
+import { usePrivy } from "@privy-io/react-auth";
 import { Mail } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 export default function Register() {
-  // const date = Date.now();
+  const { login, logout, user } = usePrivy();
+  const router = useRouter();
   const [regisMode, setRegisMode] = useState<"signup" | "login">("login");
+
+  if (user) {
+    router.push("/emogen");
+  }
   return (
     <>
       <main className="w-full max-w-[480px] mx-auto px-md py-xl flex flex-col items-center gap-lg z-10">
@@ -22,7 +29,6 @@ export default function Register() {
 
         {/*<!-- Hero Identity Header -->*/}
         <div className="text-center space-y-sm">
-          
           <div className="inline-flex items-center justify-center p-sm glass-surface rounded-full mb-sm border-white/5">
             <span className="text-display-emoji font-display-emoji">
               🚀 🌈 ✨
@@ -43,7 +49,10 @@ export default function Register() {
           {/*<!-- Tab Toggle -->*/}
           <div className="flex p-1 bg-surface-container-low rounded-full">
             <button
-              onClick={() => setRegisMode("login")}
+              onClick={() => {
+                login();
+                setRegisMode("login");
+              }}
               className={`${regisMode === "login" ? `flex-1 py-sm px-md rounded-full font-label-bold text-label-bold bg-white/10 text-white transition-all shadow-sm` : `flex-1 py-sm px-md rounded-full font-label-bold text-label-bold text-on-surface-variant hover:text-white transition-all`}`}
             >
               LOGIN
@@ -60,13 +69,10 @@ export default function Register() {
           {regisMode === "login" ? (
             <>
               <div className="space-y-sm">
-                <button className="w-full flex items-center justify-center gap-sm py-sm px-md glass-surface rounded-full border-white/10 hover:border-secondary transition-all active:scale-[0.98]">
-                  <img
-                    alt="Google Logo"
-                    className="w-5 h-5"
-                    src="https://storage.googleapis.com/pe-portal-consumer-prod-wagtail-static/images/GoogleG_FullColor_White_RGB_1.width-1024.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=wagtail%40pe-portal-consumer-prod.iam.gserviceaccount.com%2F20260430%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260430T164449Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=456bb314c1dc4ec4e9116fe0261b9821ee37e40c3b5715a5651ff97fb498c1f0714d43ae284cc9faf29682d2f1ee960ed88e94696305e59baf6f6c1107d288e0f2a23a5250a7b640c4d67663feac290a0470b25bbbf4da9f1070c24bb6a2e70aa6a58172f168efc5ae0d037e7d78e9f8ba9ab5d9722266e88053960c9ee694a2b3a510d872fe3bcb4189fb88f354128e4a48fe19614ed5ee71d97ed6af30c71a2097e9f9f91a15a5738a0973a74fea5f15689010ede18b71c79c4b1de5f0a52022735ba6805777082802e6a89f981c1156e3f7e53df93506ac9fd96a507d8dc6a0f1eab229423aeffd7b8c0d5d9a94dba9c1d4cfcf2a12e95a33cc7bd7da4aee"
-                    data-alt="Official Google G logo in bright primary colors for social login button"
-                  />
+                <button
+                  onClick={() => login()}
+                  className="w-full flex items-center justify-center gap-sm py-sm px-md glass-surface rounded-full border-white/10 hover:border-secondary transition-all active:scale-[0.98]"
+                >
                   <span className="font-label-bold text-label-bold text-white uppercase tracking-widest">
                     Continue with Google
                   </span>

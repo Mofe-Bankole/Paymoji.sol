@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const showcaseNames = [
   "RAINBOWPIZZA.SOL",
@@ -99,6 +101,7 @@ function accentClasses(accent: "primary" | "secondary" | "tertiary") {
 }
 
 export default function Home() {
+  const router = useRouter();
   return (
     <main className="relative isolate overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(183,109,255,0.28),_transparent_28%),radial-gradient(circle_at_80%_22%,_rgba(0,203,230,0.22),_transparent_24%),linear-gradient(180deg,_rgba(6,14,32,0.96),_rgba(11,19,38,1))]" />
@@ -134,93 +137,24 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-16 px-6 pb-16 pt-14 md:grid-cols-[minmax(0,1.1fr)_minmax(320px,460px)] md:items-center md:pb-24 md:pt-20">
-        <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-            <span className="h-2 w-2 rounded-full bg-secondary shadow-[0_0_14px_rgba(93,230,255,0.9)]" />
-            Solana identity rails for emoji-native payments
-          </div>
-
-          <h1 className="mt-6 max-w-3xl text-5xl font-black tracking-[-0.08em] text-white md:text-7xl">
-            Your wallet, rewritten in emoji.
+      <section className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 text-center bg-gradient-to-b from-background/80 to-background/50">
+        <div className="max-w-6xl space-y-6">
+          <h1 className="text-6xl font-extrabold tracking-tight text-white md:text-8xl drop-shadow-lg">
+            🎉 Emoji your wallet!
           </h1>
-
-          <p className="mt-6 max-w-2xl text-lg text-on-surface-variant md:text-xl">
-            Claim a three-emoji `.sol` identity, turn it into a payment handle,
-            and make crypto feel personal enough to remember.
+          <p className="text-xl text-white/80 md:text-2xl">
+            Turn three emojis into a .sol identity and start sending crypto with
+            personality.
           </p>
-
-          <div className="mt-10 flex max-w-2xl items-center gap-3 rounded-2xl bg-white/5 p-4">
-            <div className="flex-1 text-3xl text-white">🚀💎🔥</div>
-            <button className="bg-electric rounded-xl px-5 py-3 text-xs font-bold text-white hover:brightness-110 transition">
-              Check
-            </button>
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-white/55">
-            <div>50,000+ early claim attempts</div>
-            <div>Private send mode</div>
-            <div>Telegram-ready UX</div>
-          </div>
+          <a
+            href="/register"
+            className="inline-block mt-4 bg-electric text-white font-bold px-8 py-4 rounded-full text-lg shadow-[0_0_30px_rgba(0,203,230,0.3)] hover:scale-105 transition-transform"
+          >
+            Claim Your Paymoji
+          </a>
         </div>
 
-        <div className="relative">
-          <div className="glass-surface neon-glow-purple relative overflow-hidden rounded-[32px] p-6 shadow-2xl shadow-black/40">
-            <div className="absolute inset-0 bg-[linear-gradient(145deg,rgba(255,255,255,0.16),transparent_36%,transparent)]" />
-            <div className="relative">
-              <div className="flex items-center justify-between rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs uppercase tracking-[0.24em] text-white/60">
-                <span>Identity card</span>
-                <span>Live on Solana</span>
-              </div>
-
-              <div className="mt-8 text-center">
-                <div className="text-7xl leading-none md:text-8xl">
-                  🌈 🦄 🍕
-                </div>
-                <div className="mt-6 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-extrabold uppercase tracking-[0.24em] text-white">
-                  rainbowpizza.sol
-                </div>
-                <div className="mt-6 rounded-[24px] border border-secondary/20 bg-black/30 px-4 py-4 font-mono text-xs text-secondary">
-                  5fWq4a4ct8ie2EiSvJ84tXkKwjVcATJxMKiTZQuFsGuH
-                </div>
-              </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-4">
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/45">
-                    Status
-                  </div>
-                  <div className="mt-2 text-lg font-bold text-white">
-                    Available
-                  </div>
-                </div>
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-4">
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/45">
-                    Privacy
-                  </div>
-                  <div className="mt-2 text-lg font-bold text-white">
-                    Stealth ready
-                  </div>
-                </div>
-                <div className="rounded-[22px] border border-white/10 bg-white/5 p-4">
-                  <div className="text-xs uppercase tracking-[0.2em] text-white/45">
-                    Network
-                  </div>
-                  <div className="mt-2 text-lg font-bold text-white">
-                    Sub-second
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-surface absolute -left-4 top-10 rounded-2xl px-4 py-3 text-2xl shadow-lg shadow-black/30">
-            🔥
-          </div>
-          <div className="glass-surface absolute -bottom-5 right-4 rounded-2xl px-4 py-3 text-2xl shadow-lg shadow-black/30">
-            ⚡
-          </div>
-        </div>
+        {/*<!-- Hero visual removed for cleaner CTA -->*/}
       </section>
 
       <section className="overflow-hidden border-y border-white/5 bg-surface-container-lowest/50 py-5">
@@ -343,7 +277,8 @@ export default function Home() {
           </p>
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <a
-              href="#"
+              href="/register"
+              onClick={() => router.push("/register")}
               className="bg-electric rounded-full px-8 py-4 text-sm font-extrabold uppercase tracking-[0.22em] text-white"
             >
               Get your paymoji

@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Emoji-native Solana identities and payments.",
 };
 
+import { PrivyAppProvider } from "./privy/PrivyProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +24,9 @@ export default function RootLayout({
       lang="en"
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <PrivyAppProvider>{children}</PrivyAppProvider>
+      </body>
     </html>
   );
 }

@@ -9,10 +9,20 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@bonfida/spl-name-service": "^3.0.21",
+    "@metaplex-foundation/mpl-core": "^1.10.0",
+    "@metaplex-foundation/umi": "^1.5.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.5.1",
+    "@metaplex-foundation/umi-web3js-adapters": "^1.5.1",
+    "@openrouter/sdk": "^0.12.24",
+    "@privy-io/react-auth": "^3.23.1",
     "@solana/web3.js": "^1.98.4",
+    "@supabase/supabase-js": "^2.105.3",
+    "axios": "^1.16.0",
     "emoji-datasource": "^16.0.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",
+    "openai": "^6.35.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-window": "^2.2.7"
