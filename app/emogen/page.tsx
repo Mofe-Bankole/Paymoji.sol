@@ -45,8 +45,10 @@ const filterOrder = Object.keys(groups)
 
 export default function Emogen() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const [solName, setSolName] = useState<string>("");
   const { user } = usePrivy();
+  console.log(user);
   const [activeFilter, setActiveFilter] = useState<string>(
     filterOrder[0] ?? "",
   );
@@ -59,6 +61,21 @@ export default function Emogen() {
 
   useEffect(() => {
     setSolName("");
+
+    if (selected.length === 3) {
+      setLoading(true);
+      generateSolName(selected)
+        .then((name) => setSolName(name))
+        .catch((err) => {
+          console.error("Sol name generation failed:", err);
+          // Fallback so the button still appears
+          const fallback =
+            selected.map((e) => e.codePointAt(0)?.toString(16)).join("") +
+            ".sol";
+          setSolName(fallback);
+        })
+        .finally(() => setLoading(false));
+    }
   }, [selected]);
 
   // Filtered list for the current category
@@ -118,22 +135,49 @@ export default function Emogen() {
             </span>
           ))}
         </div>
-        {selected.length === 3 && solName && (
-          <div
-            onClick={() => handleSolName(selected)}
-            className={`px-5 mt-1 py-2 text-sm cursor-pointer rounded-[5px] border bg-white/5 border-white/10 hover:bg-white/10`}
-          >
-            {solName}
+        {selected.length === 3 && (
+          <div className="flex flex-col items-center gap-3 mt-1">
+            {/* Sol name display — only show once we have it */}
+            {solName && (
+              <div className="px-5 py-2 text-sm rounded-[5px] border bg-white/5 border-white/10">
+                {solName}
+              </div>
+            )}
+
+            {/* Button area — spinner while loading, button once ready */}
+            {loading ? (
+              <div className="mt-4 px-8 py-3 flex items-center gap-2 text-sm text-white/50">
+                <svg
+                  className="animate-spin h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  />
+                </svg>
+                Generating your identity...
+              </div>
+            ) : solName ? (
+              <button
+                onClick={() => handleClaim()}
+                className="mt-4 px-8 py-3 rounded-full text-sm font-bold text-white bg-electric shadow-[0_0_30px_rgba(0,203,230,0.2)] hover:scale-[1.02] transition-transform duration-150"
+              >
+                Continue as {solName}
+              </button>
+            ) : null}
           </div>
-        )}
-        {selected.length === 3 ? (
-          <button
-            className={`mt-4 px-8 py-3 rounded-full text-sm font-bold text-white transition-transform duration-150 ${selected.length === 3 ? "bg-electric shadow-[0_0_30px_rgba(0,203,230,0.2)] hover:scale-[1.02]" : "bg-white/10 cursor-not-allowed"}`}
-          >
-            Continue as {solName || "foxwave.sol"}
-          </button>
-        ) : (
-          ""
         )}
         {/* Filter tabs – minimal radius (5px) */}
         <nav className="flex flex-wrap gap-2 justify-center">

@@ -1,0 +1,10 @@
+{
+  "name": "Paymoji Identities",
+  "symbol": "PAYMOJI",
+  "description": "Unique 3-emoji identities on Solana. Your identity. 3 emojis.",
+  "image": "https://raw.githubusercontent.com/YOURUSERNAME/paymoji/main/public/logo.png",
+  "external_url": "https://paymoji.xyz",
+  "properties": {
+    "category": "identity"
+  }
+}
