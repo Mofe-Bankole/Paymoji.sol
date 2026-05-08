@@ -47,11 +47,6 @@ export async function chatCompletion(params: {
   for await (const chunk of stream) {
     const content = chunk.choices?.[0]?.delta?.content;
     if (content) fullResponse += content;
-
-    // Final chunk includes usage data – log reasoning tokens
-    if (chunk.usage) {
-      console.log("\nReasoning tokens:", chunk.usage.completion_tokens);
-    }
   }
 
   return fullResponse.trim();
@@ -85,6 +80,5 @@ Examples: cosmos.sol, tigershock.sol, foxwave.sol
 
   const raw = await chatCompletion({ systemPrompt, userMessage });
   const name = raw.replace(/\s+/g, "").toLowerCase();
-  console.log(name);
   return name.endsWith(".sol") ? name : `${name}.sol`;
 }

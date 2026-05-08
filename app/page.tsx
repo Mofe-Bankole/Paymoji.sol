@@ -1,4 +1,5 @@
 "use client";
+import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -102,6 +103,7 @@ function accentClasses(accent: "primary" | "secondary" | "tertiary") {
 
 export default function Home() {
   const router = useRouter();
+  const { user, login, logout } = usePrivy();
   return (
     <main className="relative isolate overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(183,109,255,0.28),_transparent_28%),radial-gradient(circle_at_80%_22%,_rgba(0,203,230,0.22),_transparent_24%),linear-gradient(180deg,_rgba(6,14,32,0.96),_rgba(11,19,38,1))]" />
@@ -128,12 +130,23 @@ export default function Home() {
             </a>
           </nav>
 
-          <a
-            href="/register"
-            className="bg-electric rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_0_30px_rgba(0,203,230,0.2)] transition-transform duration-150 hover:scale-[1.02]"
-          >
-            Login
-          </a>
+          {user ? (
+            <a
+              href=""
+              onClick={() => logout()}
+              className="bg-electric rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_0_30px_rgba(0,203,230,0.2)] transition-transform duration-150 hover:scale-[1.02]"
+            >
+              Logout
+            </a>
+          ) : (
+            <a
+              href="/register"
+              onClick={() => login()}
+              className="bg-electric rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_0_30px_rgba(0,203,230,0.2)] transition-transform duration-150 hover:scale-[1.02]"
+            >
+              Login
+            </a>
+          )}
         </div>
       </header>
 
@@ -181,10 +194,6 @@ export default function Home() {
           <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-white md:text-5xl">
             Where form meets function—and both swipe right.
           </h2>
-          <p className="mt-4 text-base text-on-surface-variant md:text-lg">
-            The UI is now organized into reusable sections so we can iterate on
-            messaging and visuals without wrestling a pasted HTML document.
-          </p>
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-3">

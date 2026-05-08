@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
+import { usePaymojiStore } from "@/lib/emojistore";
 import { useState, useMemo, useEffect } from "react";
 import emojiData from "emoji-datasource/emoji.json";
 import { generateSolName } from "@/lib/generateSolName";
@@ -48,7 +50,9 @@ export default function Emogen() {
   const [loading, setLoading] = useState(false);
   const [solName, setSolName] = useState<string>("");
   const { user } = usePrivy();
-  console.log(user);
+  const { setStoreEmojis, setStoreSolName } = usePaymojiStore();
+  const router = useRouter();
+  console.log(user?.google?.email);
   const [activeFilter, setActiveFilter] = useState<string>(
     filterOrder[0] ?? "",
   );
@@ -56,7 +60,6 @@ export default function Emogen() {
   const handleSolName = async (selected: string[]) => {
     const name = await generateSolName(selected);
     setSolName(name);
-    await createMetaPlexCollection(selected);
   };
 
   useEffect(() => {
@@ -171,7 +174,11 @@ export default function Emogen() {
               </div>
             ) : solName ? (
               <button
-                onClick={() => handleClaim()}
+                onClick={() => {
+                  setStoreEmojis(selected);
+                  setStoreSolName(solName);
+                  router.push("/mint");
+                }}
                 className="mt-4 px-8 py-3 rounded-full text-sm font-bold text-white bg-electric shadow-[0_0_30px_rgba(0,203,230,0.2)] hover:scale-[1.02] transition-transform duration-150"
               >
                 Continue as {solName}

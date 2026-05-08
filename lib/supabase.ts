@@ -5,8 +5,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
 );
 
-export default supabase;
-
 export interface Identity {
   privy_user_id: string;
   emoji_combo: string;
@@ -45,9 +43,9 @@ export async function registerPaymoji(payload: Identity) {
 export async function isEmojiAvailable(combo: string): Promise<boolean> {
   const { data } = await supabase
     .from("identities")
-    .select("id")
+    .select("emoji_combo")
     .eq("emoji_combo", combo)
-    .single();
+    .maybeSingle();
   return !data;
 }
 
@@ -56,7 +54,7 @@ export async function hasIdentity(privyUserId: string): Promise<boolean> {
     .from("identities")
     .select("id")
     .eq("privy_user_id", privyUserId)
-    .single();
+    .maybeSingle();
   return !!data;
 }
 
@@ -75,6 +73,8 @@ export async function resolveEmoji(combo: string): Promise<string | null> {
     .select("wallet")
     .eq("emoji_combo", combo)
     .eq("is_active", true)
-    .single();
+    .maybeSingle();
   return data?.wallet ?? null;
 }
+
+export default supabase;
