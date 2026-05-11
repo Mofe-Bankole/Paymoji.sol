@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "sns:register-root": "npx tsx scripts/sns-paymoji.ts register-root",
+    "sns:create-sub": "npx tsx scripts/sns-paymoji.ts create-sub",
+    "sns:register-paymoji-devnet": "npx tsx scripts/register-paymoji-devnet.ts"
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^3.0.21",
@@ -16,6 +19,7 @@
     "@metaplex-foundation/umi-web3js-adapters": "^1.5.1",
     "@openrouter/sdk": "^0.12.24",
     "@privy-io/react-auth": "^3.23.1",
+    "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
     "@supabase/supabase-js": "^2.105.3",
     "axios": "^1.16.0",
@@ -26,6 +30,7 @@
     "openai": "^6.35.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-qr-code": "^2.0.21",
     "react-window": "^2.2.7",
     "zustand": "^5.0.13"
   },
@@ -37,6 +42,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

@@ -1,12 +1,11 @@
 "use client";
 import Link from "next/link";
-import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
 import { usePaymojiStore } from "@/lib/emojistore";
 import { useState, useMemo, useEffect } from "react";
 import emojiData from "emoji-datasource/emoji.json";
 import { generateSolName } from "@/lib/generateSolName";
-import { createMetaPlexCollection } from "@/scripts/createCollection";
+import { paymojiSubdomainsEnabled, paymojiSnsParentLabel } from "@/lib/paymojiSns";
 
 const groups = {
   "Smileys & Emotion": "Smileys",
@@ -49,43 +48,42 @@ export default function Emogen() {
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [solName, setSolName] = useState<string>("");
-  const { user } = usePrivy();
   const { setStoreEmojis, setStoreSolName } = usePaymojiStore();
   const router = useRouter();
-  console.log(user?.google?.email);
   const [activeFilter, setActiveFilter] = useState<string>(
     filterOrder[0] ?? "",
   );
 
-  const handleSolName = async (selected: string[]) => {
-    const name = await generateSolName(selected);
-    setSolName(name);
-  };
-
   useEffect(() => {
-    setSolName("");
+    if (selected.length !== 3) return;
 
-    if (selected.length === 3) {
+    let cancelled = false;
+    (async () => {
+      await Promise.resolve();
+      if (cancelled) return;
       setLoading(true);
-      generateSolName(selected)
-        .then((name) => setSolName(name))
-        .catch((err) => {
-          console.error("Sol name generation failed:", err);
-          // Fallback so the button still appears
-          const fallback =
-            selected.map((e) => e.codePointAt(0)?.toString(16)).join("") +
-            ".sol";
-          setSolName(fallback);
-        })
-        .finally(() => setLoading(false));
-    }
+      try {
+        const name = await generateSolName(selected);
+        if (!cancelled) setSolName(name);
+      } catch (err) {
+        console.error("Sol name generation failed:", err);
+        const fallback =
+          selected.map((e) => e.codePointAt(0)?.toString(16)).join("") + ".sol";
+        if (!cancelled) setSolName(fallback);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [selected]);
 
   // Filtered list for the current category
   const emojis = useMemo(() => grouped[activeFilter] ?? [], [activeFilter]);
 
   const toggleEmoji = (char: string) => {
-    console.log(char);
     setSelected((prev) => {
       if (prev.includes(char)) return prev.filter((c) => c !== char);
       if (prev.length < 3) return [...prev, char];
@@ -93,20 +91,28 @@ export default function Emogen() {
     });
   };
 
-  // Render emojis using a plain CSS grid (6 columns). Emojis are slightly smaller for a compact view.
   const renderGrid = () => (
-    <div className="grid grid-cols-12 gap-2">
+    <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 sm:gap-2.5 md:grid-cols-10 md:gap-3 lg:grid-cols-12">
       {emojis.map((e) => {
         const isSelected = selected.includes(e.char);
         return (
           <button
             key={e.char}
+            type="button"
             onClick={() => toggleEmoji(e.char)}
-            className={`flex items-center justify-center py-2 rounded border ${isSelected ? "bg-primary/20 border-primary" : "bg-white/5 border-white/10 hover:bg-white/10"}`}
+            className={`flex min-h-[52px] items-center justify-center rounded-xl border py-2.5 transition-colors md:min-h-[60px] md:py-3 ${
+              isSelected
+                ? "border-primary bg-primary/20"
+                : "border-white/10 bg-white/5 hover:bg-white/10"
+            }`}
           >
-            <span className="text-xl" aria-label={e.char}>
+            <span
+              className="text-3xl leading-none md:text-4xl lg:text-[2.75rem]"
+              aria-hidden
+            >
               {e.char}
             </span>
+            <span className="sr-only">{e.name}</span>
           </button>
         );
       })}
@@ -126,24 +132,37 @@ export default function Emogen() {
         >
           Paymoji
         </Link>
-        <div className="flex gap-4 text-6xl">
+        <div className="flex gap-5 text-7xl md:gap-6 md:text-8xl">
           {selected.map((c, i) => (
-            <span key={i} className="text-display-emoji">
+            <span key={i} className="leading-none font-display-emoji">
               {c}
             </span>
           ))}
           {Array.from({ length: 3 - selected.length }).map((_, i) => (
-            <span key={"ph" + i} className="text-display-emoji text-white/30">
+            <span
+              key={"ph" + i}
+              className="font-display-emoji leading-none text-white/30"
+            >
               ❓
             </span>
           ))}
         </div>
         {selected.length === 3 && (
-          <div className="flex flex-col items-center gap-3 mt-1">
-            {/* Sol name display — only show once we have it */}
+          <div className="mt-1 flex flex-col items-center gap-3">
             {solName && (
-              <div className="px-5 py-2 text-sm rounded-[5px] border bg-white/5 border-white/10">
-                {solName}
+              <div className="flex flex-col items-center gap-1">
+                <div className="rounded-[5px] border border-white/10 bg-white/5 px-5 py-2 font-mono text-sm text-white">
+                  {solName}
+                </div>
+                {paymojiSubdomainsEnabled() ? (
+                  <p className="max-w-sm text-center text-xs text-on-surface-variant">
+                    On devnet this becomes{" "}
+                    <span className="font-medium text-secondary">
+                      {`*.${paymojiSnsParentLabel()}.sol`}
+                    </span>{" "}
+                    (subdomain of {paymojiSnsParentLabel()}.sol).
+                  </p>
+                ) : null}
               </div>
             )}
 

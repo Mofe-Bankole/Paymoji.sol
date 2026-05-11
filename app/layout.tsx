@@ -1,3 +1,4 @@
+import { PrivyAppProvider } from "../privy/PrivyProvider";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -11,8 +12,6 @@ export const metadata: Metadata = {
   title: "Paymoji",
   description: "Emoji-native Solana identities and payments.",
 };
-
-import { PrivyAppProvider } from "./privy/PrivyProvider";
 
 export default function RootLayout({
   children,

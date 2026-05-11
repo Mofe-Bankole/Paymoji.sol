@@ -101,6 +101,28 @@ function accentClasses(accent: "primary" | "secondary" | "tertiary") {
   return "bg-primary/15 text-primary ring-primary/30";
 }
 
+function Hero() {
+  return (
+    <section className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 text-center bg-gradient-to-b from-background/80 to-background/50">
+      <div className="max-w-6xl space-y-6">
+        <h1 className="text-6xl font-extrabold tracking-tight text-white md:text-8xl drop-shadow-lg">
+          🎉 Emoji your wallet!
+        </h1>
+        <p className="text-xl text-white/80 md:text-2xl">
+          Turn three emojis into a .sol identity and start sending crypto with
+          personality.
+        </p>
+        <a
+          href="/register"
+          className="inline-block mt-4 bg-electric text-white font-bold px-8 py-4 rounded-full text-lg shadow-[0_0_30px_rgba(0,203,230,0.3)] hover:scale-105 transition-transform"
+        >
+          Claim Your Paymoji
+        </a>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const { user, login, logout } = usePrivy();
@@ -150,25 +172,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 text-center bg-gradient-to-b from-background/80 to-background/50">
-        <div className="max-w-6xl space-y-6">
-          <h1 className="text-6xl font-extrabold tracking-tight text-white md:text-8xl drop-shadow-lg">
-            🎉 Emoji your wallet!
-          </h1>
-          <p className="text-xl text-white/80 md:text-2xl">
-            Turn three emojis into a .sol identity and start sending crypto with
-            personality.
-          </p>
-          <a
-            href="/register"
-            className="inline-block mt-4 bg-electric text-white font-bold px-8 py-4 rounded-full text-lg shadow-[0_0_30px_rgba(0,203,230,0.3)] hover:scale-105 transition-transform"
-          >
-            Claim Your Paymoji
-          </a>
-        </div>
-
-        {/*<!-- Hero visual removed for cleaner CTA -->*/}
-      </section>
+      <Hero />
 
       <section className="overflow-hidden border-y border-white/5 bg-surface-container-lowest/50 py-5">
         <div className="animate-marquee flex min-w-max gap-10 px-6">
