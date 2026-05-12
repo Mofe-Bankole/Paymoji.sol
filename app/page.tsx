@@ -103,21 +103,61 @@ function accentClasses(accent: "primary" | "secondary" | "tertiary") {
 
 function Hero() {
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 text-center bg-gradient-to-b from-background/80 to-background/50">
-      <div className="max-w-6xl space-y-6">
-        <h1 className="text-6xl font-extrabold tracking-tight text-white md:text-8xl drop-shadow-lg">
-          🎉 Emoji your wallet!
+    <section className="relative mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-7xl flex-col justify-center px-6 py-20 md:py-28">
+      <div className="max-w-4xl">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+          <span aria-hidden>⚡</span>
+          Emoji identity on Solana
+        </div>
+
+        <h1 className="mt-6 text-5xl font-black tracking-[-0.07em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
+          Your wallet should feel
+          <span className="block text-gradient-sol">human, not hexadecimal.</span>
         </h1>
-        <p className="text-xl text-white/80 md:text-2xl">
-          Turn three emojis into a .sol identity and start sending crypto with
-          personality.
+
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/75 md:text-xl">
+          Claim a memorable emoji identity, mint it onchain, and send payments
+          with a name people can actually remember.
         </p>
-        <a
-          href="/register"
-          className="inline-block mt-4 bg-electric text-white font-bold px-8 py-4 rounded-full text-lg shadow-[0_0_30px_rgba(0,203,230,0.3)] hover:scale-105 transition-transform"
-        >
-          Claim Your Paymoji
-        </a>
+
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href="/register"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-electric px-8 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] text-white shadow-[0_0_30px_rgba(0,203,230,0.3)] transition-transform hover:scale-[1.02]"
+          >
+            Claim your Paymoji
+          </Link>
+          <a
+            href="#how-it-works"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/15 bg-white/5 px-8 py-3.5 text-sm font-bold uppercase tracking-[0.16em] text-white/90 transition-colors hover:bg-white/10"
+          >
+            See how it works
+          </a>
+        </div>
+      </div>
+
+      <div className="mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+        <div className="glass-surface rounded-2xl p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+            Identity
+          </p>
+          <p className="mt-2 text-xl font-black text-white">3 emojis</p>
+          <p className="mt-1 text-sm text-on-surface-variant">One name, yours forever.</p>
+        </div>
+        <div className="glass-surface rounded-2xl p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+            Transfer
+          </p>
+          <p className="mt-2 text-xl font-black text-white">Fast on devnet</p>
+          <p className="mt-1 text-sm text-on-surface-variant">Low-friction send and receive.</p>
+        </div>
+        <div className="glass-surface rounded-2xl p-4">
+          <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+            Ownership
+          </p>
+          <p className="mt-2 text-xl font-black text-white">Minted NFT</p>
+          <p className="mt-1 text-sm text-on-surface-variant">Onchain proof of identity.</p>
+        </div>
       </div>
     </section>
   );
