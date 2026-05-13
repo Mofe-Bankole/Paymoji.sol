@@ -324,10 +324,7 @@ export default function Home() {
           <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] text-white md:text-5xl">
             Pick your trio and make your wallet memorable.
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-base text-on-surface-variant md:text-lg">
-            The page is now structured for real product work: easier to edit,
-            easier to expand, and much safer inside Next’s App Router.
-          </p>
+          
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <a
               href="/register"

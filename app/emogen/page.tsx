@@ -5,9 +5,12 @@ import { usePaymojiStore } from "@/lib/emojistore";
 import { useState, useMemo, useEffect } from "react";
 import emojiData from "emoji-datasource/emoji.json";
 import { generateSolName } from "@/lib/generateSolName";
-import { paymojiSubdomainsEnabled, paymojiSnsParentLabel } from "@/lib/paymojiSns";
+import {
+  paymojiSubdomainsEnabled,
+  paymojiSnsParentLabel,
+} from "@/lib/paymojiSns";
 
-const groups = {
+const groups: any = {
   "Smileys & Emotion": "Smileys",
   "People & Body": "People",
   "Animals & Nature": "Animals",
@@ -92,7 +95,7 @@ export default function Emogen() {
   };
 
   const renderGrid = () => (
-    <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 sm:gap-2.5 md:grid-cols-10 md:gap-3 lg:grid-cols-12">
+    <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 sm:gap-2.5 md:grid-cols-10 md:gap-3 lg:grid-cols-14">
       {emojis.map((e) => {
         const isSelected = selected.includes(e.char);
         return (
@@ -100,14 +103,14 @@ export default function Emogen() {
             key={e.char}
             type="button"
             onClick={() => toggleEmoji(e.char)}
-            className={`flex min-h-[52px] items-center justify-center rounded-xl border py-2.5 transition-colors md:min-h-[60px] md:py-3 ${
+            className={`flex min-h-[52px] items-center justify-center rounded-sm border py-2.5 transition-colors md:min-h-[30px] md:py-3 ${
               isSelected
                 ? "border-primary bg-primary/20"
                 : "border-white/10 bg-white/5 hover:bg-white/10"
             }`}
           >
             <span
-              className="text-3xl leading-none md:text-4xl lg:text-[2.75rem]"
+              className="text-4xl leading-none md:text-xl lg:text-[1.6rem]"
               aria-hidden
             >
               {e.char}
@@ -151,12 +154,9 @@ export default function Emogen() {
           <div className="mt-1 flex flex-col items-center gap-3">
             {solName && (
               <div className="flex flex-col items-center gap-1">
-                <div className="rounded-[5px] border border-white/10 bg-white/5 px-5 py-2 font-mono text-sm text-white">
-                  {solName}
-                </div>
                 {paymojiSubdomainsEnabled() ? (
-                  <p className="max-w-sm text-center text-xs text-on-surface-variant">
-                    On devnet this becomes{" "}
+                  <p className="max-w-2xl mt-3 text-center text-xs text-on-surface-variant">
+                    On chain this becomes{" "}
                     <span className="font-medium text-secondary">
                       {`*.${paymojiSnsParentLabel()}.sol`}
                     </span>{" "}
