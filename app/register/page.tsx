@@ -38,7 +38,7 @@ export default function Register() {
           </p>
         </div>
 
-        <div className="relative w-full space-y-lg overflow-hidden rounded-lg glass-surface p-md shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <div className="relative w-full space-y-lg overflow-hidden glass-surface p-md shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
           <div className="absolute top-0 left-0 h-[1px] w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
           {!loggedIn ? (

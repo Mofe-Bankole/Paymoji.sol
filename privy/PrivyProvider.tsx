@@ -51,7 +51,7 @@ const isSolanaWallet = (w: unknown) => {
 
 /* -------------------- Wallet Provider -------------------- */
 
-function PrivyWalletProvider({ children }: { children: ReactNode }) {
+export function PrivyWalletProvider({ children }: { children: ReactNode }) {
   const { ready, authenticated, login, logout } = usePrivy();
   const { wallets } = useWallets();
 

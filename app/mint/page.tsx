@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import { usePaymojiStore } from "@/lib/emojistore";
-import { usePrivyWallet } from "../../privy/PrivyProvider";
+import { usePrivyWallet } from "@/privy/PrivyProvider";
+import { usePaymojiToast } from "@/components/notifications/paymoji-toast-provider";
 
 export default function MintPage() {
   const router = useRouter();
   const { user } = usePrivy();
   const { address } = usePrivyWallet();
+  const { pushToast } = usePaymojiToast();
   const { emojis, solName, setStoreSolName } = usePaymojiStore();
 
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,14 @@ export default function MintPage() {
       await new Promise((r) => setTimeout(r, 1700));
 
       await showStatus("✨ Paymoji minted successfully!");
+
+      pushToast({
+        kind: "identity_minted",
+        title: "Paymoji minted",
+        message: `${result.emojiCombo ?? emojis.join("")} is live as ${result.solName ?? solName}`,
+        href: result.explorerUrl,
+      });
+
       if (typeof window !== "undefined" && result?.nftAddress) {
         try {
           window.sessionStorage.setItem(

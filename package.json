@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^3.0.21",
+    "@dialectlabs/react-sdk-blockchain-solana": "^3.0.0-beta.7",
+    "@dialectlabs/react-ui": "^3.0.0-beta.7",
     "@metaplex-foundation/mpl-core": "^1.10.0",
     "@metaplex-foundation/umi": "^1.5.1",
     "@metaplex-foundation/umi-bundle-defaults": "^1.5.1",

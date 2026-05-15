@@ -202,7 +202,7 @@ export default function WalletPage() {
           </Link>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Link
-              href="/send"
+              href="/wallet/send"
               className="px-4 py-2 text-white/50 hover:text-white transition-colors"
             >
               Send
@@ -308,7 +308,7 @@ export default function WalletPage() {
               />
               <span className="text-xs text-white/35">SOL</span>
               <Link
-                href={`/send${sendTo ? `?to=${encodeURIComponent(sendTo)}` : ""}`}
+                href={`/wallet/send${sendTo ? `?to=${encodeURIComponent(sendTo)}` : ""}`}
                 className="ml-auto bg-white text-[#0b1326] text-xs font-bold px-4 py-2 flex items-center gap-1 hover:opacity-90 transition-opacity"
               >
                 Send <ArrowUpRight className="h-3 w-3" />

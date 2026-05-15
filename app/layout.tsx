@@ -1,6 +1,7 @@
-import { PrivyAppProvider } from "../privy/PrivyProvider";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import "@dialectlabs/react-ui/index.css";
+import { ClientProviders } from "@/components/providers/client-providers";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -24,7 +25,7 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <PrivyAppProvider>{children}</PrivyAppProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

@@ -21,6 +21,7 @@ import {
   normalizeSolName,
 } from "@/lib/registerSns";
 import { resolvePaymojiSnsDomain } from "@/lib/paymojiSns";
+import { sendIdentityMintedAlert } from "@/lib/dialect/send-alert";
 import { isEmojiAvailable, registerPaymoji } from "@/lib/supabase";
 
 export type ClaimRequest = {
@@ -225,6 +226,13 @@ export async function POST(request: Request) {
     } catch (dbErr) {
       console.error("Mint succeeded but Supabase identity save failed:", dbErr);
     }
+
+    void sendIdentityMintedAlert({
+      recipientWallet: wallet,
+      emojiCombo: combo,
+      solName: effectiveSolName,
+    }).catch((err) => console.warn("[Dialect] mint alert:", err));
+
     // Log for server‑side visibility
     console.log("✅ Minted successfully!");
     console.log("NFT Address :", nftAddress);
