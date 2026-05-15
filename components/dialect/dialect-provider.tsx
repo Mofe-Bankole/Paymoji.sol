@@ -1,14 +1,17 @@
 "use client";
-import { PrivyAppProvider } from "@/privy/PrivyProvider";
 
 import dynamic from "next/dynamic";
 import { useMemo, type ReactNode } from "react";
 import { DialectSolanaSdk } from "@dialectlabs/react-sdk-blockchain-solana";
 import type { DialectSolanaWalletAdapter } from "@dialectlabs/react-sdk-blockchain-solana";
-import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
+import {
+  PublicKey,
+  Transaction,
+  VersionedTransaction,
+} from "@solana/web3.js";
 import { useWallets } from "@privy-io/react-auth/solana";
+import { WalletAdapterShell } from "@/components/solana/wallet-adapter-shell";
 import { getDialectClientConfig } from "@/lib/dialect/config";
-// import { PrivyWalletProvider } from "@/privy/PrivyProvider";
 
 const DialectInAppListener = dynamic(
   () =>
@@ -18,26 +21,29 @@ const DialectInAppListener = dynamic(
   { ssr: false },
 );
 
+const EMPTY_ADAPTER: DialectSolanaWalletAdapter = { publicKey: null };
+
 function isSolanaWallet(w: unknown) {
-  const wallet = w as { standardWallet?: { chains?: string[] } };
+  const wallet = w as { standardWallet?: { chains?: readonly string[] } };
   return wallet.standardWallet?.chains?.some((c) =>
-    c.toLowerCase().includes("solana"),
+    String(c).toLowerCase().includes("solana"),
   );
 }
 
-function useDialectWalletAdapter(): DialectSolanaWalletAdapter | null {
+function useDialectWalletAdapter(): DialectSolanaWalletAdapter {
   const { wallets, ready } = useWallets();
 
   return useMemo(() => {
-    if (!ready) return null;
+    if (!ready) return EMPTY_ADAPTER;
+
     const wallet = wallets.find(isSolanaWallet);
-    if (!wallet?.address) return null;
+    if (!wallet?.address) return EMPTY_ADAPTER;
 
     let publicKey: PublicKey | null = null;
     try {
       publicKey = new PublicKey(wallet.address);
     } catch {
-      return null;
+      return EMPTY_ADAPTER;
     }
 
     return {
@@ -59,9 +65,12 @@ function useDialectWalletAdapter(): DialectSolanaWalletAdapter | null {
                   });
             const { signedTransaction } = await wallet.signTransaction!({
               transaction: bytes,
+              chain: "solana:devnet",
             });
             if (tx instanceof VersionedTransaction) {
-              return VersionedTransaction.deserialize(signedTransaction) as T;
+              return VersionedTransaction.deserialize(
+                signedTransaction,
+              ) as T;
             }
             return Transaction.from(signedTransaction) as T;
           }
@@ -79,15 +88,15 @@ export function DialectProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <PrivyAppProvider>
+    <WalletAdapterShell>
       <DialectSolanaSdk
-        // provider={PrivyAppProvid}
         dappAddress={config.dappAddress}
         config={{ environment: config.environment }}
-        customWalletAdapter={walletAdapter ?? undefined}
+        customWalletAdapter={walletAdapter}
       >
+        {walletAdapter.publicKey ? <DialectInAppListener /> : null}
         {children}
       </DialectSolanaSdk>
-    </PrivyAppProvider>
+    </WalletAdapterShell>
   );
 }

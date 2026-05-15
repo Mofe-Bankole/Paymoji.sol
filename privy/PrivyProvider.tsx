@@ -13,14 +13,41 @@ import {
   usePrivy,
 } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
+import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
 import {
   Connection,
   PublicKey,
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
+import { DEVNET_RPC, MAINNET_RPC } from "@/lib/solana-network";
 
-const DEVNET_RPC = `https://api.devnet.solana.com`;
+function httpToWs(httpUrl: string) {
+  return httpUrl.replace(/^https?:\/\//, (m) =>
+    m.startsWith("https") ? "wss://" : "ws://",
+  );
+}
+
+const PRIVY_SOLANA_CONFIG = {
+  loginMethods: ["google", "email"] as const,
+  embeddedWallets: {
+    solana: {
+      createOnLogin: "users-without-wallets" as const,
+    },
+  },
+  solana: {
+    rpcs: {
+      "solana:mainnet": {
+        rpc: createSolanaRpc(MAINNET_RPC),
+        rpcSubscriptions: createSolanaRpcSubscriptions(httpToWs(MAINNET_RPC)),
+      },
+      "solana:devnet": {
+        rpc: createSolanaRpc(DEVNET_RPC),
+        rpcSubscriptions: createSolanaRpcSubscriptions(httpToWs(DEVNET_RPC)),
+      },
+    },
+  },
+};
 
 type PrivyContextProps = {
   connection: Connection;
@@ -132,53 +159,7 @@ export function PrivyAppProvider({ children }: { children: ReactNode }) {
   return (
     <PrivySDKProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
-      config={{
-        loginMethods: ["google", "email"],
-
-        embeddedWallets: {
-          solana: {
-            createOnLogin: "users-without-wallets",
-          },
-        },
-
-        supportedChains: [
-          {
-            id: 103,
-            name: "Solana Devnet",
-            nativeCurrency: {
-              name: "SOL",
-              symbol: "SOL",
-              decimals: 9,
-            },
-            rpcUrls: {
-              default: {
-                http: [DEVNET_RPC],
-              },
-              privyWalletOverride: {
-                http: [DEVNET_RPC],
-              },
-            },
-          },
-        ],
-
-        defaultChain: {
-          id: 103,
-          name: "Solana Devnet",
-          nativeCurrency: {
-            name: "SOL",
-            symbol: "SOL",
-            decimals: 9,
-          },
-          rpcUrls: {
-            default: {
-              http: [DEVNET_RPC],
-            },
-            privyWalletOverride: {
-              http: [DEVNET_RPC],
-            },
-          },
-        },
-      }}
+      config={PRIVY_SOLANA_CONFIG}
     >
       <PrivyWalletProvider>{children}</PrivyWalletProvider>
     </PrivySDKProvider>

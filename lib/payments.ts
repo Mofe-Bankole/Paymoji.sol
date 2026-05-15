@@ -9,10 +9,10 @@ import {
   Connection,
   LAMPORTS_PER_SOL,
   PublicKey,
-  sendAndConfirmTransaction,
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import { clusterFromNetwork, rpcUrlForNetwork } from "@/lib/solana-network";
 
 export interface PaymentRequest {
   mode: "public" | "private";
@@ -70,12 +70,8 @@ export async function publicPayment(
     };
   }
 
-  const connection = new Connection(
-    payload.network === "mainnet"
-      ? "https://api.mainnet-beta.solana.com"
-      : "https://api.devnet.solana.com",
-    "confirmed",
-  );
+  const connection = new Connection(rpcUrlForNetwork(payload.network), "confirmed");
+  const chain = clusterFromNetwork(payload.network);
 
   // ---------- Build transaction ----------
   const recipientPubkey = new PublicKey(payload.recipient);
@@ -136,8 +132,25 @@ export async function publicPayment(
     // Here we assume the server holds a temporary keypair for demo purposes.
     // Replace `sendAndConfirmTransaction` with a call that asks the user's wallet
     // to sign the tx (e.g. via `window.solana.signAndSendTransaction`).
-    const signed = await solanaWallet.signTransaction(transaction);
-    const signature = await connection.sendRawTransaction(signed.serialize(), {
+    const txBytes = transaction.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false,
+    });
+
+    // Privy embedded wallets default to mainnet unless `chain` is set explicitly.
+    const signResult = await solanaWallet.signTransaction({
+      transaction: txBytes,
+      chain,
+    });
+
+    const signedBytes: Uint8Array =
+      signResult?.signedTransaction instanceof Uint8Array
+        ? signResult.signedTransaction
+        : signResult instanceof Uint8Array
+          ? signResult
+          : (signResult as Transaction).serialize();
+
+    const signature = await connection.sendRawTransaction(Buffer.from(signedBytes), {
       skipPreflight: false,
       preflightCommitment: "confirmed",
     });

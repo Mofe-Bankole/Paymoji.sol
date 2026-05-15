@@ -2,8 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { useHistory, useSubscribe } from "@dialectlabs/react-sdk";
-import { usePrivyWallet } from "@/privy/PrivyProvider";
-import { getDialectClientConfig } from "@/lib/dialect/config";
 import { usePaymojiToast } from "@/components/notifications/paymoji-toast-provider";
 import type { PaymojiToastKind } from "@/lib/notifications/types";
 
@@ -37,31 +35,26 @@ function classifyAlert(title: string, body: string): PaymojiToastKind {
 }
 
 /**
- * Subscribes the connected wallet to Dialect IN_APP alerts and surfaces
- * new messages as Paymoji-styled toasts (bottom-right).
+ * Mounted only when Privy wallet + Dialect Solana SDK are ready
+ * (see `DialectProvider`). Subscribes IN_APP and mirrors alerts to toasts.
  */
-export function DialectInAppListener() {
-  const { address, isLoggedIn, isReady } = usePrivyWallet();
+function DialectInAppListenerActive() {
   const { pushToast } = usePaymojiToast();
   const { subscribe } = useSubscribe({ channel: "IN_APP" });
   const { history } = useHistory({ refreshInterval: 5000 });
   const seenRef = useRef<Set<string>>(loadSeen());
   const subscribedRef = useRef(false);
 
-  const dialectEnabled = Boolean(getDialectClientConfig());
-
   useEffect(() => {
-    if (!dialectEnabled || !isReady || !isLoggedIn || !address) return;
     if (subscribedRef.current) return;
-
     subscribedRef.current = true;
     subscribe().catch(() => {
       subscribedRef.current = false;
     });
-  }, [dialectEnabled, isReady, isLoggedIn, address, subscribe]);
+  }, [subscribe]);
 
   useEffect(() => {
-    if (!dialectEnabled || !history?.alerts?.length) return;
+    if (!history?.alerts?.length) return;
 
     const seen = seenRef.current;
     const fresh = [...history.alerts].sort(
@@ -82,7 +75,11 @@ export function DialectInAppListener() {
     }
 
     saveSeen(seen);
-  }, [dialectEnabled, history, pushToast]);
+  }, [history, pushToast]);
 
   return null;
+}
+
+export function DialectInAppListener() {
+  return <DialectInAppListenerActive />;
 }
