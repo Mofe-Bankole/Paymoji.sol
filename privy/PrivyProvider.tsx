@@ -11,6 +11,7 @@ import {
 import {
   PrivyProvider as PrivySDKProvider,
   usePrivy,
+  PrivyClientConfig,
 } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { createSolanaRpc, createSolanaRpcSubscriptions } from "@solana/kit";
@@ -159,7 +160,7 @@ export function PrivyAppProvider({ children }: { children: ReactNode }) {
   return (
     <PrivySDKProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
-      config={PRIVY_SOLANA_CONFIG}
+      config={PRIVY_SOLANA_CONFIG as unknown as PrivyClientConfig}
     >
       <PrivyWalletProvider>{children}</PrivyWalletProvider>
     </PrivySDKProvider>
