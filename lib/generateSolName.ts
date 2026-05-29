@@ -1,28 +1,17 @@
+import "server-only";
 import OpenAI from "openai";
 import { resolvePaymojiSnsDomain } from "@/lib/paymojiSns";
 
 const openai = new OpenAI({
-  apiKey:
-    process.env.NEXT_PUBLIC_OPENAI_API_KEY ??
-    process.env.NEXT_PUBLIC_OPENROUTER_API_KEY ??
-    "",
+  apiKey: process.env.OPENAI_API_KEY ?? process.env.OPENROUTER_API_KEY ?? "",
   baseURL: "https://openrouter.ai/api/v1",
-  dangerouslyAllowBrowser: true,
 });
 
 const DEFAULT_MODEL =
-  process.env.NEXT_PUBLIC_OPENAI_MODEL ??
-  process.env.NEXT_PUBLIC_OPENROUTER_MODEL ??
+  process.env.OPENAI_MODEL ??
+  process.env.OPENROUTER_MODEL ??
   "openai/gpt-oss-120b:free";
 
-/**
- * Generic chat‑completion helper that streams the response.
- *
- * @param params.model        – optional model override
- * @param params.systemPrompt – system instruction for the LLM
- * @param params.userMessage  – the user‑facing prompt
- * @returns The full assembled response string.
- */
 export async function chatCompletion(params: {
   model?: string;
   systemPrompt: string;
@@ -31,10 +20,9 @@ export async function chatCompletion(params: {
   const { model = DEFAULT_MODEL, systemPrompt, userMessage } = params;
 
   if (!openai.apiKey) {
-    throw new Error("OpenAI API key is not configured");
+    throw new Error("OpenRouter API key is not configured");
   }
 
-  // OpenAI SDK streaming call
   const stream = await openai.chat.completions.create({
     model,
     stream: true,
@@ -53,12 +41,6 @@ export async function chatCompletion(params: {
   return fullResponse.trim();
 }
 
-/**
- * Generate a concise `.sol` name from exactly three emojis.
- *
- * @param emojis - Array of three emoji strings, e.g. ["🚀","🦄","🔥"]
- * @returns A short, lower‑case name ending with `.sol`
- */
 export async function generateSolName(emojis: string[]): Promise<string> {
   if (emojis.length !== 3) {
     throw new Error("Exactly three emojis are required");

@@ -4,15 +4,12 @@ import dynamic from "next/dynamic";
 import { useMemo, type ReactNode } from "react";
 import { DialectSolanaSdk } from "@dialectlabs/react-sdk-blockchain-solana";
 import type { DialectSolanaWalletAdapter } from "@dialectlabs/react-sdk-blockchain-solana";
-import {
-  PublicKey,
-  Transaction,
-  VersionedTransaction,
-} from "@solana/web3.js";
+import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { WalletAdapterShell } from "@/components/solana/wallet-adapter-shell";
 import { getDialectClientConfig } from "@/lib/dialect/config";
 
+// Dialect in-app listener
 const DialectInAppListener = dynamic(
   () =>
     import("@/components/dialect/dialect-in-app-listener").then(
@@ -21,6 +18,7 @@ const DialectInAppListener = dynamic(
   { ssr: false },
 );
 
+// Adaprter based on solana , dependent on publickey
 const EMPTY_ADAPTER: DialectSolanaWalletAdapter = { publicKey: null };
 
 function isSolanaWallet(w: unknown) {
@@ -68,9 +66,7 @@ function useDialectWalletAdapter(): DialectSolanaWalletAdapter {
               chain: "solana:devnet",
             });
             if (tx instanceof VersionedTransaction) {
-              return VersionedTransaction.deserialize(
-                signedTransaction,
-              ) as T;
+              return VersionedTransaction.deserialize(signedTransaction) as T;
             }
             return Transaction.from(signedTransaction) as T;
           }

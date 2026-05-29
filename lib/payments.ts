@@ -14,6 +14,7 @@ import {
 } from "@solana/web3.js";
 import { clusterFromNetwork, rpcUrlForNetwork } from "@/lib/solana-network";
 
+
 export interface PaymentRequest {
   mode: "public" | "private";
   amount: number;
@@ -23,6 +24,12 @@ export interface PaymentRequest {
   token?: "SOL" | string;
 }
 
+/**
+ * Transfer payload object
+ *
+ * Object passed 
+ * 
+ */
 export interface TransferPayload {
   mode: "public" | "private";
   amount: number;

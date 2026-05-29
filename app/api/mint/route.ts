@@ -38,12 +38,9 @@ export type ClaimRequest = {
 
 export async function POST(request: Request) {
   try {
-    const connection = new Connection(
-      "https://api.devnet.solana.com",
-      "finalized",
-    );
+    const connection = new Connection(process.env.NEXT_PUBLIC_DEVNET_RPC_URL!, "finalized");
 
-    const keyMaterial = process.env.NEXT_PUBLIC_PRIVATE_KEY;
+    const keyMaterial = process.env.OPERATOR_PRIVATE_KEY;
     if (!keyMaterial) {
       return NextResponse.json(
         { error: "Server operator key is not configured." },

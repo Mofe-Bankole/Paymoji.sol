@@ -6,8 +6,9 @@ import {
 } from "@metaplex-foundation/mpl-core";
 import { generateSigner, publicKey } from "@metaplex-foundation/umi";
 import { PAYMOJI_BRAND_IMAGE_URL } from "@/lib/paymojiBrand";
+import { Connection } from "@solana/web3.js";
 
-const DEVNET = "https://api.devnet.solana.com";
+const DEVNET = new Connection("https://api.devnet.solana.com", "confirmed");
 
 export type MintNftResult = {
   nftAddress: string;

@@ -9,7 +9,7 @@ export function paymojiSubdomainsEnabled(): boolean {
   const v = (
     process.env.NEXT_PUBLIC_PAYMOJI_SUBDOMAINS ??
     process.env.PAYMOJI_SUBDOMAINS ??
-    ""
+    "paymoji.sol"
   )
     .trim()
     .toLowerCase();

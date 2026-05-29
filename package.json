@@ -6,10 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "sns:register-root": "npx tsx scripts/sns-paymoji.ts register-root",
-    "sns:create-sub": "npx tsx scripts/sns-paymoji.ts create-sub",
-    "sns:register-paymoji-devnet": "npx tsx scripts/register-paymoji-devnet.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@bonfida/spl-name-service": "^3.0.21",

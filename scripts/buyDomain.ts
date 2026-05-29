@@ -11,13 +11,14 @@ import {
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 
+const raw = process.env.OPERATOR_PRIVATE_KEY || process.env.PAYER_PRIVATE_KEY;
+if (!raw) {
+  console.error("Set OPERATOR_PRIVATE_KEY or PAYER_PRIVATE_KEY in .env");
+  process.exit(1);
+}
+
 const operatorKeypair = Keypair.fromSecretKey(
-  Uint8Array.from([
-    124, 229, 56, 205, 106, 195, 19, 22, 206, 95, 145, 70, 34, 151, 34, 24, 233,
-    131, 206, 198, 147, 216, 120, 95, 130, 70, 219, 103, 51, 140, 99, 145, 209,
-    162, 4, 18, 85, 86, 144, 21, 25, 113, 237, 80, 214, 112, 64, 206, 172, 53,
-    129, 126, 117, 22, 173, 144, 212, 208, 28, 22, 81, 223, 3, 159,
-  ]),
+  Uint8Array.from(JSON.parse(raw)),
 );
 
 const name = "paymoji";
@@ -25,7 +26,7 @@ const space = 1000;
 
 async function main() {
   const connection = new Connection(
-    "https://api.devnet.solana.com",
+    process.env.NEXT_PUBLIC_DEVNET_RPC_URL!,
     "confirmed",
   );
 

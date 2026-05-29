@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { usePaymojiStore } from "@/lib/emojistore";
 import { useState, useMemo, useEffect } from "react";
 import emojiData from "emoji-datasource/emoji.json";
-import { generateSolName } from "@/lib/generateSolName";
 import {
   paymojiSubdomainsEnabled,
   paymojiSnsParentLabel,
@@ -66,8 +65,14 @@ export default function Emogen() {
       if (cancelled) return;
       setLoading(true);
       try {
-        const name = await generateSolName(selected);
-        if (!cancelled) setSolName(name);
+        const res = await fetch("/api/generate-name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emojis: selected }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Generation failed");
+        if (!cancelled) setSolName(data.name);
       } catch (err) {
         console.error("Sol name generation failed:", err);
         const fallback =

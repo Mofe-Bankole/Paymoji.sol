@@ -14,7 +14,7 @@
 // );
 
 // export async function createMetaPlexCollection() {
-//   const umi = createUmi("https://api.devnet.solana.com").use(mplCore());
+//   const umi = createUmi(process.env.NEXT_PUBLIC_DEVNET_RPC_URL!).use(mplCore());
 //   umi.use(keypairIdentity(fromWeb3JsKeypair(operatorKeypair)));
 
 //   const collection = generateSigner(umi);

@@ -15,7 +15,7 @@ export interface Identity {
 
 let client: SupabaseClient | null | undefined;
 
-function getSupabase(): SupabaseClient | null {
+export function getSupabase(): SupabaseClient | null {
   if (client !== undefined) return client;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -66,6 +66,7 @@ export async function registerPaymoji(payload: Identity) {
     console.error("Failed to register Paymoji identity:", error);
     throw error;
   }
+
   return data as Identity | null;
 }
 
@@ -140,6 +141,129 @@ export async function getIdentityByWallet(wallet: string) {
   return data;
 }
 
+export async function logPayment(payload: {
+  sender_wallet: string;
+  recipient_wallet: string;
+  sender_emoji?: string;
+  recipient_emoji?: string;
+  amount: number;
+  token: string;
+  signature: string;
+  note?: string;
+}) {
+  const supabase = getSupabase();
+  if (!supabase) return;
+
+  const { error } = await supabase.from("payments").insert([{
+    sender_wallet: payload.sender_wallet,
+    recipient_wallet: payload.recipient_wallet,
+    sender_emoji: payload.sender_emoji ?? null,
+    recipient_emoji: payload.recipient_emoji ?? null,
+    amount: payload.amount,
+    token: payload.token,
+    signature: payload.signature,
+    note: payload.note ?? null,
+  }]);
+
+  if (error) console.error("[logPayment]", error);
+}
+
+export async function getPaymentFeed(limit = 20): Promise<any[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("payments")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[getPaymentFeed]", error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function getPaymentsForWallet(wallet: string, limit = 20): Promise<any[]> {
+  const supabase = getSupabase();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("payments")
+    .select("*")
+    .or(`sender_wallet.eq.${wallet},recipient_wallet.eq.${wallet}`)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("[getPaymentsForWallet]", error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export async function tickStreak(wallet: string): Promise<{ current: number; longest: number }> {
+  const supabase = getSupabase();
+  if (!supabase) return { current: 0, longest: 0 };
+
+  const today = new Date().toISOString().split("T")[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+  const { data: existing } = await supabase
+    .from("streaks")
+    .select("*")
+    .eq("wallet", wallet)
+    .maybeSingle();
+
+  if (!existing) {
+    await supabase.from("streaks").insert([{
+      wallet,
+      current_streak: 1,
+      longest_streak: 1,
+      last_active_date: today,
+    }]);
+    return { current: 1, longest: 1 };
+  }
+
+  const lastDate = existing.last_active_date?.split("T")[0];
+  let current = existing.current_streak ?? 0;
+  let longest = existing.longest_streak ?? 0;
+
+  if (lastDate === today) {
+    return { current, longest };
+  }
+
+  if (lastDate === yesterday) {
+    current += 1;
+  } else {
+    current = 1;
+  }
+
+  if (current > longest) longest = current;
+
+  await supabase
+    .from("streaks")
+    .update({ current_streak: current, longest_streak: longest, last_active_date: today })
+    .eq("wallet", wallet);
+
+  return { current, longest };
+}
+
+export async function getStreak(wallet: string): Promise<{ current: number; longest: number } | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+
+  const { data } = await supabase
+    .from("streaks")
+    .select("current_streak, longest_streak")
+    .eq("wallet", wallet)
+    .maybeSingle();
+
+  if (!data) return null;
+  return { current: data.current_streak, longest: data.longest_streak };
+}
+
 export async function resolveEmoji(combo: string): Promise<string | null> {
   const supabase = getSupabase();
   if (!supabase) return null;
@@ -156,4 +280,33 @@ export async function resolveEmoji(combo: string): Promise<string | null> {
     return null;
   }
   return data?.wallet ?? null;
+}
+
+export async function getPaymentCountForWallet(wallet: string): Promise<number> {
+  const supabase = getSupabase();
+  if (!supabase) return 0;
+
+  const { data, error } = await supabase
+    .from("payments")
+    .select("id")
+    .or(`sender_wallet.eq.${wallet},recipient_wallet.eq.${wallet}`);
+
+  if (error) {
+    console.error("[getPaymentCountForWallet]", error);
+    return 0;
+  }
+  return data?.length ?? 0;
+}
+
+export function getBadges(paymentCount: number, streakDays: number): { label: string; emoji: string; earned: boolean }[] {
+  return [
+    { label: "First Payment", emoji: "🌟", earned: paymentCount >= 1 },
+    { label: "Casual Sender", emoji: "📬", earned: paymentCount >= 5 },
+    { label: "Power User", emoji: "⚡", earned: paymentCount >= 10 },
+    { label: "Paymoji Pro", emoji: "💎", earned: paymentCount >= 25 },
+    { label: "Whale", emoji: "🐋", earned: paymentCount >= 50 },
+    { label: "3-Day Streak", emoji: "🔥", earned: streakDays >= 3 },
+    { label: "7-Day Streak", emoji: "🔥🔥", earned: streakDays >= 7 },
+    { label: "14-Day Streak", emoji: "🔥🔥🔥", earned: streakDays >= 14 },
+  ];
 }

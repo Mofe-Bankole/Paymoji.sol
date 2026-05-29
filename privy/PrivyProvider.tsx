@@ -30,7 +30,7 @@ function httpToWs(httpUrl: string) {
 }
 
 const PRIVY_SOLANA_CONFIG = {
-  loginMethods: ["google", "email"] as const,
+  loginMethods: ["google", "email", "twitter"] as const,
   embeddedWallets: {
     solana: {
       createOnLogin: "users-without-wallets" as const,
@@ -58,10 +58,6 @@ type PrivyContextProps = {
   isLoggedIn: boolean;
   login: () => void;
   logout: () => void;
-  // signTransaction: <T extends Transaction | VersionedTransaction>(
-  //   tx: T,
-  // ) => Promise<T>;
-  // signMessage: (msg: Uint8Array) => Promise<Uint8Array>;
 };
 
 const PrivyContext = createContext<PrivyContextProps | undefined>(undefined);
@@ -114,20 +110,6 @@ export function PrivyWalletProvider({ children }: { children: ReactNode }) {
 
     return wallet;
   };
-
-  // const signTransaction = async <T extends Transaction | VersionedTransaction>(
-  //   tx: T,
-  // ): Promise<T> => {
-  //   const wallet = getWallet();
-  //   const signed = await wallet.signTransaction(tx);
-  //   return signed as unknown as T;
-  // };
-
-  // const signMessage = async (msg: Uint8Array): Promise<Uint8Array> => {
-  //   const wallet = getWallet();
-  //   const { signature } = await wallet.signMessage(msg);
-  //   return signature;
-  // };
 
   return (
     <PrivyContext.Provider

@@ -13,6 +13,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useWallets } from "@privy-io/react-auth/solana";
 import { publicPayment } from "@/lib/payments";
 import { usePaymojiToast } from "@/components/notifications/paymoji-toast-provider";
+import { Connection } from "@solana/web3.js";
 
 const DEVNET_USDC_MINT =
   process.env.NEXT_PUBLIC_USDC_MINT ??
@@ -20,7 +21,7 @@ const DEVNET_USDC_MINT =
 type SendStatus = "idle" | "resolving" | "pending" | "success" | "error";
 type Token = "SOL" | "USDC";
 
-const QUICK_AMOUNTS = ["0.1", "0.5", "1", "5"];
+const QUICK_AMOUNTS = ["0.1", "0.3", "0.5", "0.7", "1", "3", "5"];
 
 // Emoji combo validator — exactly 3 emoji characters
 function isEmojiCombo(val: string): boolean {
@@ -42,17 +43,17 @@ export default function SendPage() {
   const { wallets, ready } = useWallets();
   const { pushToast } = usePaymojiToast();
   const solanaWallet = wallets[0];
-  
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [token, setToken] = useState<Token>("SOL");
   const [note, setNote] = useState("");
-  const [isAnon, setIsAnon] = useState(false);
   const [status, setStatus] = useState<SendStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [resolvedWallet, setResolvedWallet] = useState("");
   const [resolvedName, setResolvedName] = useState("");
   const [txSig, setTxSig] = useState("");
+  const [feeEstimate, setFeeEstimate] = useState("~0.000005 SOL");
+  const [feeLoading, setFeeLoading] = useState(false);
 
   const amountNumber = Number(amount);
   const isRecipientValid = useMemo(
@@ -100,6 +101,39 @@ export default function SendPage() {
     return () => clearTimeout(timer);
   }, [recipient, isRecipientValid]);
 
+  // Compute fee estimate when recipient is resolved
+  useEffect(() => {
+    if (!resolvedWallet || !amountNumber) {
+      setFeeEstimate("~0.000005 SOL");
+      return;
+    }
+    let dead = false;
+    (async () => {
+      setFeeLoading(true);
+      try {
+        const conn = new Connection(
+          process.env.NEXT_PUBLIC_DEVNET_RPC_URL || "https://api.devnet.solana.com",
+          "confirmed",
+        );
+        const { blockhash } = await conn.getLatestBlockhash();
+        const tx = new (await import("@solana/web3.js")).Transaction();
+        tx.recentBlockhash = blockhash;
+        tx.feePayer = new (await import("@solana/web3.js")).PublicKey(solanaWallet?.address || "11111111111111111111111111111111");
+        const message = tx.compileMessage();
+        const fee = await conn.getFeeForMessage(message);
+        const feeSol = (fee.value || 5000) / 1e9;
+        if (!dead) {
+          setFeeEstimate(`~${feeSol.toFixed(8)} SOL`);
+        }
+      } catch {
+        if (!dead) setFeeEstimate("~0.000005 SOL");
+      } finally {
+        if (!dead) setFeeLoading(false);
+      }
+    })();
+    return () => { dead = true; };
+  }, [resolvedWallet, amountNumber, solanaWallet?.address]);
+
   const reset = () => {
     if (status === "error") {
       setStatus("idle");
@@ -111,12 +145,6 @@ export default function SendPage() {
     e.preventDefault();
     if (!canSubmit) return;
 
-    if (isAnon) {
-      setStatus("error");
-      setErrorMessage("Anonimoji sends are not available yet on devnet.");
-      return;
-    }
-
     if (!ready || !solanaWallet?.address) {
       setStatus("error");
       setErrorMessage("Connect your Solana wallet to send.");
@@ -126,7 +154,9 @@ export default function SendPage() {
     const toWallet = resolvedWallet.trim();
     if (!toWallet) {
       setStatus("error");
-      setErrorMessage("Could not resolve recipient. Check the address or emoji.");
+      setErrorMessage(
+        "Could not resolve recipient. Check the address or emoji.",
+      );
       return;
     }
 
@@ -170,6 +200,26 @@ export default function SendPage() {
           amount: amountNumber,
           token,
         }),
+      });
+
+      void fetch("/api/payments/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender_wallet: solanaWallet.address,
+          recipient_wallet: toWallet,
+          amount: amountNumber,
+          token: token === "USDC" ? "USDC" : "SOL",
+          signature: result.id,
+          recipient_emoji: isEmojiCombo(recipient) ? recipient : undefined,
+          note
+        }),
+      });
+
+      void fetch("/api/streaks/tick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: solanaWallet.address }),
       });
     } catch (err) {
       setStatus("error");
@@ -411,31 +461,6 @@ export default function SendPage() {
                   />
                 </div>
 
-                {/* Anonimoji toggle */}
-                <div className="flex items-center gap-3 border border-white/8 bg-white/[0.02] px-4 py-3.5">
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-white">
-                      Anonimoji 👻
-                    </p>
-                    <p className="text-xs text-white/35 mt-0.5">
-                      Zero on-chain link between sender and receiver
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsAnon((p) => !p)}
-                    className={`relative w-11 h-6 border transition-colors flex-shrink-0 ${
-                      isAnon
-                        ? "bg-[#5de6ff]/20 border-[#5de6ff]/40"
-                        : "bg-white/5 border-white/15"
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 w-4 h-4 bg-white transition-all duration-200 ${isAnon ? "left-[22px]" : "left-1"}`}
-                    />
-                  </button>
-                </div>
-
                 {/* Error */}
                 {status === "error" && (
                   <div className="border border-red-400/20 bg-red-500/8 px-4 py-3 text-sm text-red-300">
@@ -451,8 +476,7 @@ export default function SendPage() {
                 >
                   {status === "pending" ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Sending
-                      {isAnon ? " privately" : ""}…
+                      <Loader2 className="h-4 w-4 animate-spin" /> Sending…
                     </>
                   ) : (
                     <>
@@ -491,12 +515,7 @@ export default function SendPage() {
                     mono: false,
                   },
                   { label: "Network", value: "Solana Devnet", mono: false },
-                  { label: "Est. fee", value: "~0.000005 SOL", mono: false },
-                  {
-                    label: "Mode",
-                    value: isAnon ? "👻 Private (Anonimoji)" : "Public",
-                    mono: false,
-                  },
+                  { label: "Est. fee", value: feeLoading ? "Estimating..." : feeEstimate, mono: false },
                 ].map(({ label, value, mono }) => (
                   <div
                     key={label}
@@ -504,7 +523,7 @@ export default function SendPage() {
                   >
                     <span className="text-xs text-white/35">{label}</span>
                     <span
-                      className={`text-xs font-semibold text-white truncate max-w-[60%] text-right ${mono ? "font-mono" : ""} ${label === "Network" ? "text-[#5de6ff]/70" : ""} ${label === "Mode" && isAnon ? "text-[#b76dff]/80" : ""}`}
+                      className={`text-xs font-semibold text-white truncate max-w-[60%] text-right ${mono ? "font-mono" : ""} ${label === "Network" ? "text-[#5de6ff]/70" : ""}`}
                     >
                       {value}
                     </span>
@@ -544,7 +563,7 @@ export default function SendPage() {
             <div className="border-t border-white/8 px-6 py-5">
               <p className="text-xs text-white/20 leading-relaxed">
                 💡 You can send to any emoji combo, .sol name, or raw Solana
-                wallet address. Toggle Anonimoji for private sends.
+                wallet address.
               </p>
             </div>
           </div>

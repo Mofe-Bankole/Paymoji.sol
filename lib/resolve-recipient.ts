@@ -1,4 +1,4 @@
-import { resolveEmoji, getIdentityByWallet } from "@/lib/supabase";
+import { resolveEmoji, getIdentityByWallet, getSupabase } from "@/lib/supabase";
 
 const EMOJI_COMBO = /^(\p{Extended_Pictographic}\uFE0F?){3}$/u;
 
@@ -34,27 +34,27 @@ export async function resolveRecipientIdentifier(
     };
   }
 
-  const solName = raw.toLowerCase().endsWith(".sol") ? raw.toLowerCase() : `${raw.toLowerCase()}.sol`;
-  const { createClient } = await import("@supabase/supabase-js");
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const solName = raw.toLowerCase().endsWith(".sol")
+    ? raw.toLowerCase()
+    : `${raw.toLowerCase()}.sol`;
 
-  if (url && key) {
-    const supabase = createClient(url, key);
-    const { data } = await supabase
-      .from("identities")
-      .select("wallet, emoji_combo, sol_name")
-      .eq("sol_name", solName)
-      .maybeSingle();
-    if (data?.wallet) {
-      return {
-        wallet: data.wallet,
-        emoji_combo: data.emoji_combo,
-        sol_name: data.sol_name,
-      };
-    }
+  const supabase = getSupabase();
+
+  if (supabase === null) {
+    throw new Error("Invalid Supabase Configuration");
+  }
+
+  const { data } = await supabase
+    .from("identities")
+    .select("wallet, emoji_combo, sol_name")
+    .eq("sol_name", solName)
+    .maybeSingle();
+  if (data?.wallet) {
+    return {
+      wallet: data.wallet,
+      emoji_combo: data.emoji_combo,
+      sol_name: data.sol_name,
+    };
   }
 
   return null;

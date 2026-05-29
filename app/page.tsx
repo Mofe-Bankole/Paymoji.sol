@@ -106,7 +106,6 @@ const MARQUEE_TECH = [
   "Helius RPC",
   "Bonfida SNS",
   "Jupiter Swap",
-  "MagicBlock Privacy",
 ];
 
 const MARQUEE_EMOJI = [
@@ -417,8 +416,8 @@ export default function Home() {
             {
               num: "03",
               title: "Privacy",
-              headline: "Anonimoji. Your choice.",
-              desc: "Toggle private mode. MagicBlock's Private Ephemeral Rollup shields amounts and counterparts. Zero on-chain link between sender and receiver.",
+              headline: "Your payments. Your control.",
+              desc: "Every transaction is transparent on Solana. You own your identity as an NFT — no platform lock-in, no gatekeepers.",
               emoji: "👻",
             },
           ].map((p, i) => (
@@ -535,7 +534,7 @@ export default function Home() {
                 },
                 {
                   emoji: "👻",
-                  text: "Toggle Anonimoji for private sends via MagicBlock",
+                  text: "No wallet address to copy-paste — just 3 emojis and you're done",
                 },
               ].map((item, i) => (
                 <div

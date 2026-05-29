@@ -1,5 +1,4 @@
 "use client";
-
 import type { ReactNode } from "react";
 import { PrivyAppProvider } from "@/privy/PrivyProvider";
 import { DialectProvider } from "@/components/dialect/dialect-provider";

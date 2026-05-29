@@ -65,6 +65,10 @@ export default function WalletPage() {
   const [sendAmt, setSendAmt] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [identity, setIdentity] = useState<Identity | null>(null);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
+  const [streakData, setStreakData] = useState<{ current: number; longest: number } | null>(null);
+  const [paymentCount, setPaymentCount] = useState(0);
 
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
@@ -131,6 +135,31 @@ export default function WalletPage() {
     return () => {
       dead = true;
     };
+  }, [address, refreshKey]);
+
+  useEffect(() => {
+    if (!address) return;
+    let dead = false;
+    Promise.all([
+      fetch(`/api/payments/feed?wallet=${encodeURIComponent(address)}&limit=10`).then(r => r.json()),
+      fetch(`/api/streaks?wallet=${encodeURIComponent(address)}`).then(r => r.json()),
+      fetch("/api/streaks/tick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wallet: address }),
+      }).then(r => r.json()),
+      fetch(`/api/payments/count?wallet=${encodeURIComponent(address)}`).then(r => r.json()),
+    ]).then(([payRes, streakRes, _tick, countRes]) => {
+      if (!dead) {
+        setPayments(payRes.payments ?? []);
+        setPaymentsLoading(false);
+        if (streakRes.streak) setStreakData(streakRes.streak);
+        if (countRes.count !== undefined) setPaymentCount(countRes.count);
+      }
+    }).catch(() => {
+      if (!dead) setPaymentsLoading(false);
+    });
+    return () => { dead = true; };
   }, [address, refreshKey]);
 
   const copyAddress = useCallback(async () => {
@@ -348,11 +377,111 @@ export default function WalletPage() {
           </div>
         </div>
 
+        {/* Streak badge */}
+        {streakData && (
+          <div className="mt-6 border border-white/10 bg-white/[0.02] px-5 py-4 flex items-center gap-4">
+            <span className="text-3xl">🔥</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-white">
+                {streakData.current}-day streak
+              </p>
+              <p className="text-xs text-white/35">
+                Best: {streakData.longest} days · Keep sending to grow it!
+              </p>
+            </div>
+            <span className="text-xs text-white/30">{paymentCount} payments</span>
+          </div>
+        )}
+
+        {/* Badges */}
+        {paymentCount > 0 && (
+          <div className="mt-4 border border-white/10 bg-white/[0.02] px-5 py-4">
+            <p className="text-[11px] uppercase tracking-widest text-white/35 mb-3">Badges</p>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { label: "First Payment", emoji: "🌟", earned: paymentCount >= 1 },
+                { label: "Casual Sender", emoji: "📬", earned: paymentCount >= 5 },
+                { label: "Power User", emoji: "⚡", earned: paymentCount >= 10 },
+                { label: "Paymoji Pro", emoji: "💎", earned: paymentCount >= 25 },
+                { label: "Whale", emoji: "🐋", earned: paymentCount >= 50 },
+                { label: "3-Day Streak", emoji: "🔥", earned: (streakData?.current ?? 0) >= 3 },
+                { label: "7-Day Streak", emoji: "🔥🔥", earned: (streakData?.current ?? 0) >= 7 },
+                { label: "14-Day Streak", emoji: "🔥🔥🔥", earned: (streakData?.current ?? 0) >= 14 },
+              ].map((badge) => (
+                <span
+                  key={badge.label}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs border ${
+                    badge.earned
+                      ? "border-[#5de6ff]/30 bg-[#5de6ff]/10 text-[#5de6ff]"
+                      : "border-white/10 bg-white/[0.03] text-white/25"
+                  }`}
+                >
+                  {badge.emoji} {badge.label}
+                  {badge.earned ? " ✓" : ""}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Payment feed */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-0">
+            <p className="text-[11px] uppercase tracking-widest text-white/35">
+              Payment activity
+            </p>
+          </div>
+          <div className="border border-white/10 border-t-0">
+            {paymentsLoading ? (
+              <div className="flex items-center justify-center gap-3 py-8 text-white/40">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm">Loading…</span>
+              </div>
+            ) : payments.length === 0 ? (
+              <p className="px-5 py-8 text-center text-sm text-white/30">
+                No payments yet. Send your first emoji payment!
+              </p>
+            ) : (
+              payments.map((p: any, i: number) => {
+                const isSent = p.sender_wallet === address;
+                return (
+                  <a
+                    key={p.signature || i}
+                    href={`https://explorer.solana.com/tx/${p.signature}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-4 px-5 py-4 bg-white/[0.02] hover:bg-white/[0.04] transition-colors ${i > 0 ? "border-t border-white/[0.06]" : ""}`}
+                  >
+                    <span className="text-2xl leading-none flex-shrink-0">
+                      {p.recipient_emoji || (isSent ? "➡️" : "⬅️")}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-white">
+                        {isSent ? "Sent" : "Received"} {p.amount} {p.token}
+                      </p>
+                      {p.note && (
+                        <p className="text-xs text-white/30 mt-0.5">"{p.note}"</p>
+                      )}
+                      <p className="text-xs text-white/25 mt-0.5">
+                        {p.created_at
+                          ? new Date(p.created_at).toLocaleDateString(undefined, {
+                              month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                            })
+                          : ""}
+                      </p>
+                    </div>
+                  </a>
+                );
+              })
+            )}
+          </div>
+        </div>
+
         {/* Transaction history */}
         <div className="mt-8">
           <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-0">
             <p className="text-[11px] uppercase tracking-widest text-white/35">
-              Recent activity
+              On-chain activity
             </p>
             {history.length > 0 && (
               <p className="text-[11px] text-white/25">Last {history.length}</p>

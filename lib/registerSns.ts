@@ -73,7 +73,7 @@ export async function buildSnsRegistrationInstructions(
 
 export async function checkSnsAvailability(name: string): Promise<boolean> {
   const connection = new Connection(
-    "https://api.devnet.solana.com",
+    process.env.NEXT_PUBLIC_DEVNET_RPC_URL!,
     "confirmed",
   );
 

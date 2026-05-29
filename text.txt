@@ -1,9 +1,0 @@
-http://paymoji.sol.sol/
-
-Buyer / parent owner: F7KVoHvp1aLKywfiWV4FfbqQW8dP6yqrdcNX1GAuFs4S
-paymoji.sol PDA: 28rGZJp9PenH4yYVNxaF5pji6Fh2Ln7sNhgZUrVP7k8d
-Buyer USDC ATA: 3zsAuVRUH5zzMAyqN7UT7hd7jCfN4AJEnebSxGbAeozQ
-Buyer SOL: 43.3866
-Building registration (registerDomainName v1, devnet)…
-✓ paymoji.sol registered
-  https://explorer.solana.com/tx/48JBC7HUQnZfKYCh5zqETBVDTTKabKuQk4NfEhqDjpmZcLN7zSKVtRAngLRRisBDzQL968az6VPgeCv2Khy1g8JV?cluster=devnet

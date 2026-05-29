@@ -26,15 +26,15 @@ import {
 } from "@solana/web3.js";
 import { loadDotEnv } from "./load-dotenv";
 
-const RPC = "https://api.devnet.solana.com";
+const RPC = process.env.NEXT_PUBLIC_DEVNET_RPC_URL!;
 const PARENT = "paymoji";
 
 function getPayer(): Keypair {
   loadDotEnv();
   const raw =
-    process.env.PAYER_PRIVATE_KEY ?? process.env.NEXT_PUBLIC_PRIVATE_KEY;
+    process.env.PAYER_PRIVATE_KEY ?? process.env.OPERATOR_PRIVATE_KEY;
   if (!raw) {
-    throw new Error("Set PAYER_PRIVATE_KEY or NEXT_PUBLIC_PRIVATE_KEY in .env");
+    throw new Error("Set PAYER_PRIVATE_KEY or OPERATOR_PRIVATE_KEY in .env");
   }
   return Keypair.fromSecretKey(Uint8Array.from(JSON.parse(raw)));
 }

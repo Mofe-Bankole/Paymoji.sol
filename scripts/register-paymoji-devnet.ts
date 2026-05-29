@@ -6,7 +6,7 @@
  *
  * Env:
  *   KEYPAIR_PATH — optional; default ~/.config/solana/id.json
- *   Else: PAYER_PRIVATE_KEY or NEXT_PUBLIC_PRIVATE_KEY in `.env` (JSON bytes)
+ *   Else: PAYER_PRIVATE_KEY or OPERATOR_PRIVATE_KEY in `.env` (JSON bytes)
  *   SOLANA_RPC_URL — optional
  *
  * Devnet USDC: 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
@@ -31,7 +31,8 @@ import {
 } from "@solana/web3.js";
 import { loadDotEnv } from "./load-dotenv";
 
-const RPC = "https://api.devnet.solana.com";
+const RPC =
+  process.env.NEXT_PUBLIC_DEVNET_RPC_URL! ?? "https://api.devnet.solana.com";
 const NAME = "paymoji";
 const SPACE = 1000;
 
@@ -50,10 +51,10 @@ function loadKeypair(): Keypair {
   }
 
   const raw =
-    process.env.PAYER_PRIVATE_KEY ?? process.env.NEXT_PUBLIC_PRIVATE_KEY;
+    process.env.PAYER_PRIVATE_KEY ?? process.env.OPERATOR_PRIVATE_KEY;
   if (!raw) {
     throw new Error(
-      "Set KEYPAIR_PATH to a Solana keypair JSON file, or PAYER_PRIVATE_KEY / NEXT_PUBLIC_PRIVATE_KEY in .env",
+      "Set KEYPAIR_PATH to a Solana keypair JSON file, or PAYER_PRIVATE_KEY / OPERATOR_PRIVATE_KEY in .env",
     );
   }
   return Keypair.fromSecretKey(Uint8Array.from(JSON.parse(raw)));
